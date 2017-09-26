@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.UserBeanMapper">
+	<resultMap type="com.web.entity.Resources" id="resources">
+		<result column="ID" property="id"/>
+		<result column="NAME" property="name"/>
+		<result column="URL" property="url"/>
+		<result column="IDNAME" property="idName"/>
+		<result column="PARENTID" property="parentId"/>
+	</resultMap>
+	
+	<resultMap type="com.web.entity.UserBean" id="userBean">
+		<result column="ID" property="id"/>
+		<result column="USERNAME" property="userName"/>
+		<result column="PASSWORD" property="passWord"/>
+		<result column="NAME" property="name"/>
+		<result column="GENDER" property="gender"/>
+		<result column="PERMISSION" property="permission"/>
+		<result column="REMARK" property="remark"/>
+	</resultMap>
+	
+	<select id="getResouces" resultMap="resources" parameterType="java.lang.Integer">
+		select r.id,r.name,r.url,r.idname,r.parentid  
+		  from RESOURCETBL r,USER_RES ur 
+		  where 
+		    r.id = ur.resid 		<!-- 条件 -->
+		  and USERID = #{id} 
+	</select>
+	
+	<select id="getUserBean" parameterType="java.lang.Integer" resultMap="userBean">
+		select U.ID,
+			   U.USERNAME,
+			   U.PASSWORD,
+			   U.NAME,
+			   U.GENDER,
+			   U.PERMISSION,
+			   U.REMARK 
+			from USERTBL U
+			where U.ID = #{id}
+	
+	</select>
+	
+	<update id="updateUserBean" parameterType="userBean">
+		update USERTBL 
+		<set>
+			<trim suffixOverrides=",">
+				<if test="userName != null">
+					USERNAME = #{userName},
+				</if>
+				<if test="passWord != null">
+					PASSWORD = #{passWord},
+				</if>
+				<if test="name != null">
+					NAME = #{name},
+				</if>
+				<if test="gender != null">
+					GENDER = #{gender},
+				</if>
+				<if test="permission != null">
+					PERMISSION = #{permission},
+				</if>
+				<if test="remark != null">
+					REMARK = #{remark},
+				</if>
+			</trim> 
+		</set>
+		 where ID = #{id}
+	</update>
+	
+	
+</mapper>

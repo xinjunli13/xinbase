@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xsi:schemaLocation=" http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+				"
+	>
+
+	
+	<!-- 数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@10.1.248.129:1521:orcl" />
+		<property name="username" value="smt" />
+		<property name="password" value="smt" />
+		
+		<property name="initialSize" value="5" />
+		<property name="maxActive" value="100" />
+		<property name="maxIdle" value="30" />
+		<property name="maxWait" value="1000" />
+	</bean>
+	
+	<context:component-scan base-package="com.web"/>
+		
+	<mvc:annotation-driven/>
+	
+	<!-- 引入mybatis配置文件 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		 <property name="configLocation" value="classpath:mybatis-config.xml"></property> 
+		<!--  <property name="mapperLocations" value="classpath:com/web/mapper/*.xml"></property> -->
+	</bean>
+    
+	<!-- mapper接口-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+		<property name="basePackage" value="com.web.dao"></property><!-- 指向dao的接口包 -->
+	</bean>
+
+	<!-- 连接事务的注解配置 --><!-- mybatis的datasource -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" >
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 登陆拦截器 -->
+	<!-- <mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/*"/>
+			<bean autowire="default"></bean>
+			login  validate不拦截
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/*"/>
+			<bean class=""/>
+		</mvc:interceptor>
+	</mvc:interceptors> -->
+	
+	<!-- <aop:config proxy-target-class="true"></aop:config> -->
+	
+	<!-- 文件上传  与request转换类型有关-->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+</beans>

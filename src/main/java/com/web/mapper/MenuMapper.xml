@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.MenuMapper">
+
+	<resultMap type="com.web.entity.Menus" id="menus">
+		<result column="ID" property="id"/>
+		<result column="NAME" property="name"/>
+		<result column="PIC" property="imgName"/>
+		<result column="PRICE" property="price"/>
+		<result column="REMARK" property="remark"/>
+	</resultMap>
+	
+	<resultMap type="com.web.entity.Menus" id="menuswithtype">
+		<result column="ID" property="id"/>
+		<result column="NAME" property="name"/>
+		<result column="PIC" property="imgName"/>
+		<result column="PRICE" property="price"/>
+		<result column="REMARK" property="remark"/>
+		<!-- <association property="" ></association> -->
+	</resultMap>
+	
+	<!-- 大于号小于号  参数{0} {1}代表第一个第二个参数-->
+	<select id="getMenusByPage" resultMap="menus" parameterType="java.lang.Integer">
+		select * from (
+			select m.*,rownum rn from MENUTBL m
+			    where rownum &lt;= #{1} )
+			    where rn &gt;= #{0}
+	</select>
+	 
+	 <select id="getAllMenus" resultMap="menus">
+	 	select * from MENUTBL
+	 </select>
+	 
+	<select id="getTotalCount" resultType="java.lang.Integer">
+		select count(*) from MENUTBL
+	</select>
+	
+	<select id="getOneMenu" parameterType="java.lang.Integer" resultMap="menus">
+		select * from MENUTBL m WHERE m.ID = #{id}
+	</select>
+	
+	<delete id="deleteMenu" parameterType="java.lang.Integer">
+		delete from MENUTBL m where m.ID = #{id}
+	
+	</delete>
+	
+	<update id="updateMenu" parameterType="com.web.entity.Menus">
+		update MENUTBL 
+		<set>
+			<trim suffixOverrides=",">
+				<if test="name != null">
+					NAME = #{name},
+				</if>
+				<if test="imgName != null">
+					PIC = #{imgName},
+				</if>
+				<if test="price != null">
+					PRICE = #{price},
+				</if>
+				<if test="mtid != null">
+					TYPEID = #{mtid},
+				</if>
+				<if test="remark != null">
+					REMARK = #{remark},
+				</if>
+			</trim>
+		</set>
+		 WHERE ID = #{id} 
+	</update>
+
+	<insert id="insertMenu" parameterType="com.web.entity.Menus">
+		insert into MENUTBL 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			id,
+			<if test="name != null">
+				NAME,
+			</if>
+			<if test="imgName != null">
+				PIC,
+			</if>
+			<if test="price != null">
+				PRICE,
+			</if>
+			<if test="remark != null">
+				REMARK,
+			</if>
+			<if test="mtid != null">
+				TYPEID,
+			</if>
+		</trim>
+		<trim prefix=" values (" suffix=")" suffixOverrides=",">
+			<!-- 建个主键序列 -->
+			SEQ_MENUTBL.nextval,
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},<!-- jdbc类型 -->
+			</if>
+			<if test="imgName != null">
+				#{imgName},
+			</if>
+			<if test="price != null">
+				#{price},
+			</if>
+			<if test="remark != null">
+				#{remark},
+			</if>
+			<if test="mtid != null">
+				#{mtid},
+			</if>
+		</trim>
+		
+	</insert>
+
+		<!--  <update id="updateRole" parameterType="Role">
+   		update t_role
+   		<set>
+			<if test="name != null">name=#{name},</if>
+			<if test="roleurl != null">roleurl=#{roleurl},</if>
+		</set>
+		where id=#{id}
+   </update> -->
+</mapper>

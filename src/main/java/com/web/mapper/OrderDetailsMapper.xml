@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.OrderDetailsMapper">
+	<resultMap type="com.web.entity.OrderDetails" id="orderDetails">
+		<result column="ID" property="id"/>
+		<result column="NUM" property="num"/>
+		<result column="REMARK" property="remark"/>
+		
+	</resultMap>
+	
+	<!-- <select id="">
+		
+	</select> -->
+	
+	<delete id="deleteOrderDetails" parameterType="java.lang.Integer">
+		delete from ORDERDETAILTBL WHERE ORDERID = #{orderId}
+	</delete>
+	
+	<insert id="insertOrderDetails" parameterType="com.web.entity.OrderDetails">
+		insert into  ORDERDETAILTBL 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="num != null">
+				NUM,
+			</if>
+			<if test="remark != null">
+				REMARK,
+			</if>
+			<if test="menuId != null">
+				MENUID,
+			</if>
+			<if test="orderId != null">
+				ORDERID,
+			</if>
+			<!-- <if test=" != null">
+				
+			</if> -->
+		</trim>
+		<trim prefix=" values(" suffix=")" suffixOverrides=",">
+			<if test="num != null">
+				1,<!-- 选多个页面没写 -->
+			</if>
+			<if test="remark != null">
+				#{remark},
+			</if>
+			<if test="menuId != null">
+				#{menuId},
+			</if>
+			<if test="orderId != null">
+				#{orderId},
+			</if>
+			<!-- <if test=" != null">
+				
+			</if> -->
+		</trim>
+	</insert>
+	
+</mapper>

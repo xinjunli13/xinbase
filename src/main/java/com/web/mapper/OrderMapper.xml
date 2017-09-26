@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.OrderMapper">
+	<resultMap type="com.web.entity.Orders" id="order">
+		<result column="ID" property="id"/>
+		<result column="IDPAY" property="idpay"/>
+		<result column="ORDERTIME" property="orderTime"/>
+		<result column="PERSONNUM" property="personNum"/>
+		<result column="REMARK" property="remark"/>
+		<result column="USERID" property="userId"/>
+		<result column="TABLEID" property="tableId"/>
+	</resultMap>
+	
+	
+	<resultMap type="com.web.entity.OrderDetails" id="orderdetails">
+		<result column="ID" property="id"/>
+		<result column="NUM" property="num"/>
+		<result column="REMARK" property="remark"/>
+	</resultMap>
+	
+	<resultMap type="com.web.entity.Menus" id="menus">
+		<result column="ID" property="id"/>
+		<result column="NAME" property="name"/>
+		<result column="PIC" property="imgName"/>
+		<result column="PRICE" property="price"/>
+		<result column="REMARK" property="remark"/>
+	</resultMap>
+	
+	<resultMap type="com.web.entity.Orders" id="orderwithot">
+		<result column="ORDERID" property="id"/>
+		<result column="ORDERIDPAY" property="idpay"/>
+		<result column="ORDERORDERTIME" property="orderTime"/>
+		<result column="ORDERPERSONNUM" property="personNum"/>
+		<result column="ORDERREMARK" property="remark"/>
+		<result column="ORDERUSERID" property="userId"/>
+		<result column="ORDERTABLEID" property="tableId"/>
+		<collection property="orderDetails" javaType="com.web.entity.OrderDetails">
+			<result column="ORDERDETAILORDERID" property="orderId"/>
+			<!-- <result column="ORDERDETAILID" property="id"/> -->
+			<result column="ORDERDETAILNUM" property="num"/>
+			<result column="ORDERDETAILREMARK" property="remark"/>
+			<result column="ORDERDETAILMENUID" property="menuId"/>
+			<association property="menus" javaType="com.web.entity.Menus">
+				<result column="MENUID" property="id"/>
+				<result column="MENUNAME" property="name"/>
+				<result column="MENUPIC" property="imgName"/>
+				<result column="MENUPRICE" property="price"/>
+				<result column="MENUREMARK" property="remark"/>
+			</association>
+		</collection>
+	</resultMap>
+	<!-- 在数据库分页有问题 -->
+	<select id="getOrdersByPage" parameterType="java.lang.Integer" resultMap="orderwithot">
+		select * from (
+			select oom.*,rownum rn from( 
+			
+				select oo.*,
+				          m.id menuid,
+				          m.typeid menutypeid,
+				          m.name menuname,
+				          m.price menuprice,
+				          m.pic menupic,
+				          m.remark menuremark 
+				      from 
+				      (  select 
+				              o.id orderid,
+				              o.tableid ordertableid,
+				              o.ordertime orderordertime,
+				              o.userid orderuserid,
+				              o.personnum orderpersonnum,
+				              o.idpay orderidpay,
+				              o.remark orderremark,
+				              od.id orderdetailid,
+				              od.num orderdetailnum,
+				              od.remark orderdetailremark,
+				              od.orderid orderdetailorderid,
+				              od.menuid orderdetailmenuid 
+				         from ORDERTBL o
+				          left outer join ORDERDETAILTBL od 
+				         on o.id = od.orderid
+				           ) oo 
+				          left outer join menutbl m 
+				          on oo.orderdetailmenuid = m.id ) oom
+			
+			    where rownum &lt;= #{1} )
+			    where rn &gt;= #{0}
+	</select>
+	
+	<!-- 在后台分页 -->
+	<select id="getOrdersList" resultMap="orderwithot">
+		select oo.*,
+				          m.id menuid,
+				          m.typeid menutypeid,
+				          m.name menuname,
+				          m.price menuprice,
+				          m.pic menupic,
+				          m.remark menuremark 
+				      from 
+				      (  select 
+				              o.id orderid,
+				              o.tableid ordertableid,
+				              o.ordertime orderordertime,
+				              o.userid orderuserid,
+				              o.personnum orderpersonnum,
+				              o.idpay orderidpay,
+				              o.remark orderremark,
+				              od.id orderdetailid,
+				              od.num orderdetailnum,
+				              od.remark orderdetailremark,
+				              od.orderid orderdetailorderid,
+				              od.menuid orderdetailmenuid 
+				         from ORDERTBL o
+				          left outer join ORDERDETAILTBL od 
+				         on o.id = od.orderid
+				           ) oo 
+				          left outer join menutbl m 
+				          on oo.orderdetailmenuid = m.id 
+				           order by oo.orderid
+	
+	</select>
+	
+	<select id="getTotalcount" resultType="java.lang.Integer">
+		select count(*) from ORDERTBL
+	</select>
+	
+	<select id="getOneOrder" resultMap="orderwithot" parameterType="java.lang.Integer">
+		select oo.*,
+          m.id menuid,
+          m.typeid menutypeid,
+          m.name menuname,
+          m.price menuprice,
+          m.pic menupic,
+          m.remark menuremark 
+      from 
+      (  select 
+              o.id orderid,
+              o.tableid ordertableid,
+              o.ordertime orderordertime,
+              o.userid orderuserid,
+              o.personnum orderpersonnum,
+              o.idpay orderidpay,
+              o.remark orderremark,
+              od.id orderdetailid,
+              od.num orderdetailnum,
+              od.remark orderdetailremark,
+              od.orderid orderdetailorderid,
+              od.menuid orderdetailmenuid 
+         from ORDERTBL o 
+           left join ORDERDETAILTBL od 
+         on o.id = od.orderid
+           where  o.id = #{id} ) oo 
+           left outer join menutbl m
+        on oo.orderdetailmenuid = m.id
+	</select>
+	
+	 <insert id="addOrder" parameterType="com.web.entity.Orders">
+		insert into ORDERTBL 
+			<trim prefix="(" suffix=")" suffixOverrides=",">
+				<if test="id != null">
+					ID,
+				</if>
+				<if test="idpay != null">
+					IDPAY,
+				</if>
+				<if test="orderTime != null">
+					ORDERTIME,
+				</if>
+				<if test="personNum != null">
+					PERSONNUM,
+				</if>
+				<if test="tableId != null">
+					TABLEID,
+				</if>
+				<if test="remark != null">
+					REMARK,
+				</if>
+			</trim>
+			<trim prefix=" values(" suffix=")" suffixOverrides=",">
+				<if test="id != null">
+					#{id},
+				</if>
+				<if test="idpay != null">
+					#{idpay},
+				</if>
+				<if test="orderTime != null">
+					#{orderTime},
+				</if>
+				<if test="personNum != null">
+					#{personNum},
+				</if>
+				<if test="tableId != null">
+					#{tableId},
+				</if>
+				<if test="remark != null">
+					#{remark},
+				</if>
+			</trim>
+	</insert>
+	
+	<update id="updateOrder" parameterType="com.web.entity.Orders">
+		update ORDERTBL 
+		<set>
+			<trim suffixOverrides=",">
+				<if test="idpay != null">
+					IDPAY = #{idpay},
+				</if>
+				<if test="orderTime != null">
+					ORDERTIME = #{orderTime},
+				</if>
+				<if test="personNum != null">
+					PERSONNUM = #{personNum},
+				</if>
+				<if test="tableId != null">
+					TABLEID = #{tableId},
+				</if>
+				<if test="remark != null">
+					REMARK = #{remark},
+				</if>
+				<if test="userId != null">
+					USERID = #{userId},
+				</if>
+			</trim>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="deleteOrder" parameterType="java.lang.Integer">
+		delete from ORDERTBL where id = #{id}
+	</delete>
+</mapper>

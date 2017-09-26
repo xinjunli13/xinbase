@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.LoginMapper">
+	<resultMap type="com.web.entity.UserBean" id="userBean">
+		<result column="ID" property="id"/>
+		<result column="USERNAME" property="userName"/>
+		<result column="PASSWORD" property="passWord"/>
+		<result column="NAME" property="name"/>
+		<result column="GENDER" property="gender"/>
+		<result column="PERMISSION" property="permission"/>
+		<result column="REMARK" property="remark"/>
+	</resultMap>
+	<!-- 获取登陆用户 -->
+	<select id="UserLogin" resultMap="userBean" parameterType="com.web.entity.UserBean">
+		select * from USERTBL t where t.USERNAME = #{userName} 
+		 and t.PASSWORD = #{passWord}
+	</select>
+	
+</mapper>

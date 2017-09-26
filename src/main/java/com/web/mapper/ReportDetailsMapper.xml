@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.ReportDetailsMapper">
+	<resultMap type="com.web.entity.ReportDetails" id="report">
+		<result column="ID" property="id"/>
+		<result column="REPORTNAME" property="reportName"/>
+		<result column="REPORTINFO" property="reportInfo"/>
+		<!-- <result column="REPORTTYPE" property="reportType"/> -->
+	</resultMap>
+	<select id="getTodayTurnover" resultMap="report">
+		select 
+			r.ID,
+			r.REPORTNAME,
+			r.REPORTINFO 
+		 from REPORTDETAIL r where r.REPORTTYPE = 'tt'
+	</select>
+	<select id="getYesterdayTurnover" resultMap="report">
+		select 
+			r.ID,
+			r.REPORTNAME,
+			r.REPORTINFO 
+		 from REPORTDETAIL r where r.REPORTTYPE = 'yt'
+	</select>
+	<select id="getMonthTurnover" resultMap="report">
+		select 
+			r.ID,
+			r.REPORTNAME,
+			r.REPORTINFO 
+		 from REPORTDETAIL r where r.REPORTTYPE = 'mt'
+	</select>
+	<select id="getTodayCustomer" resultMap="report">
+		select 
+			r.ID,
+			r.REPORTNAME,
+			r.REPORTINFO 
+		 from REPORTDETAIL r where r.REPORTTYPE = 'tc'
+	</select>
+</mapper>

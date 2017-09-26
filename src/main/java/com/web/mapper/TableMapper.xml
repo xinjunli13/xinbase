@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.TableMapper">
+	<resultMap type="com.web.entity.Tables" id="table">
+		<result column="ID" property="id"/>
+		<result column="ORD_ID" property="orderNo"/>
+		<result column="NUM" property="personNum"/>
+		<result column="FLAG" property="tableState"/>
+		<result column="DESCRIPTION" property="discription"/>
+	</resultMap>
+	
+	<select id="getTablesByPage" resultMap="table" parameterType="java.lang.Integer">
+		select * from (
+			select t.*,rownum rn from TABLETBL t
+			    where rownum &lt;= #{1} )
+			    where rn &gt;= #{0}
+	</select>
+	
+	<select id="getAllTables" resultMap="table">
+		select * from TABLETBL
+	
+	</select>
+	
+	<select id="getTotalTableCount" resultType="java.lang.Integer">
+		select count(*) from TABLETBL 
+	</select>
+	
+	<select id="getOneTable" parameterType="java.lang.Integer" resultMap="table">
+		select * from TABLETBL t where t.ID = #{id} 
+	</select>
+	
+	<insert id="addTables" parameterType="com.web.entity.Tables">
+		insert into TABLETBL 
+			<trim prefix="(" suffix=")" suffixOverrides=",">
+				ID,
+				<if test="orderNo != null">
+					ORD_ID,
+				</if>
+				<if test="personNum != null">
+					NUM,
+				</if>
+				<if test="discription != null">
+					DESCRIPTION,
+				</if>
+				<if test="tableState != null">
+					FLAG,
+				</if>
+			</trim>
+			<trim prefix=" values (" suffix=")" suffixOverrides=",">
+				<!-- 主键序列 -->
+					seq_tabletblid.nextval,
+				<if test="orderNo != null">
+					#{orderNo},
+				</if>
+				<if test="personNum != null">
+					#{personNum},
+				</if>
+				<if test="discription != null">
+					#{discription},
+				</if>
+				<if test="tableState != null">
+					#{tableState},
+				</if>
+			</trim>
+			
+	</insert>
+	
+	<delete id="deleteTables" parameterType="java.lang.Integer">
+		delete from TABLETBL t where t.ID = #{id}
+	</delete>
+	
+	<update id="updateTable" parameterType="com.web.entity.Tables">
+		update TABLETBL 
+		<set>
+			<trim suffixOverrides=",">
+				<if test="orderNo != null">
+					ORD_ID = #{orderNo},
+				</if>
+				<if test="personNum != null">
+					NUM = #{personNum},
+				</if>
+				<if test="discription != null">
+					DESCRIPTION = #{discription},
+				</if>
+				<if test="tableState != null">
+					FLAG = #{tableState},
+				</if>
+			</trim>
+		</set>
+		where ID = #{id}
+	</update>
+	
+</mapper>
